@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Input, DatePicker, Button } from "antd";
+import { Form, Input, DatePicker, Button, Radio } from "antd";
 import axios from "axios";
 
 const ReminderForm = ({ onAdd }) => {
@@ -18,6 +18,12 @@ const ReminderForm = ({ onAdd }) => {
 
   return (
     <Form form={form} onFinish={onFinish} layout="inline" style={{ marginBottom: 20 }}>
+      <Form.Item label="Type" name="type" rules={[{ required: true }]}>
+  <Radio.Group>
+    <Radio value="reminder">Reminder (one-time)</Radio>
+    <Radio value="alarm">Alarm (daily)</Radio>
+  </Radio.Group>
+</Form.Item>
       <Form.Item name="title" rules={[{ required: true, message: "Title required" }]}>
         <Input placeholder="Reminder Title" />
       </Form.Item>

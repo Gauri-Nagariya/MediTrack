@@ -3,6 +3,13 @@ import Reminder from "../models/Reminder.js";
 
 const router = express.Router();
 
+// mark reminder as notified
+router.patch("/:id", async (req, res) => {
+  const { notified } = req.body;
+  const reminder = await Reminder.findByIdAndUpdate(req.params.id, { notified }, { new: true });
+  res.json(reminder);
+});
+
 // create reminder
 router.post("/", async (req, res) => {
   try {

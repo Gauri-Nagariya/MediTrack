@@ -9,6 +9,7 @@ const { Title } = Typography;
 const ReminderHome = () => {
   const [refresh, setRefresh] = useState(false);
 
+
 useEffect(() => {
   if (Notification.permission !== "granted") {
     Notification.requestPermission();
@@ -16,13 +17,14 @@ useEffect(() => {
 }, []);
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Header>
-        <Title style={{ color: "white", margin: 0 }} level={2}>
+    <Layout style={{ minHeight: "80vh" }}>
+      {/* <Header>
+       <Title style={{ color: "white", margin: 0 }} level={2}>
           Reminders App
         </Title>
-      </Header>
-      <Content style={{ padding: 20 }}>
+      </Header> */}
+      {/* <Content style={{ padding: "0, 20" }}> */}
+      <Content style={{ padding: "16px 100px"}}>
         <ReminderForm onAdd={() => setRefresh(!refresh)} />
         <ReminderList refresh={refresh} />
       </Content>
