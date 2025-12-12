@@ -22,10 +22,30 @@ import "./utils/scheduler.js";
 const app = express();
 // app.use(cors());
 // allow frontend to access backend
+
+const allowedOrigins = [
+  "http://localhost:5173",                 // development
+  "https://meditrack-black.vercel.app"     // production
+];
+
+
+// app.use(cors({
+//   origin: "http://localhost:5173", // Vite frontend port
+//   credentials: true,
+// }));
+
+
 app.use(cors({
-  origin: "http://localhost:5173", // Vite frontend port
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true); // allow Postman or server-to-server requests
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error("CORS not allowed"), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
 }));
+
 
 app.use(express.json());
 
