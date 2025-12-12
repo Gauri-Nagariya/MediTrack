@@ -1,8 +1,8 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/logo.png";
-// import { DownOutlined } from "@ant-design/icons";
 import { Dropdown, message, Space } from "antd";
+import { AppContext } from "../Context/AppContext";
 
 const handleMenuClick = ({ key }) => {
   const section = document.getElementById(key);
@@ -35,10 +35,10 @@ const items = [
 ];
 
 const Nav = () => {
-  return (
-    // <nav className="bg-white h-16 flex items-center justify-end pr-16 relative font-medium font-acumin-pro text-md shadow-sm">
-    <nav className="sticky top-0 z-50 bg-white h-16 flex items-center justify-end pr-16 font-medium font-acumin-pro text-md shadow-sm">
+  const { user, setShowLogin, logout } = useContext(AppContext);
 
+  return (
+    <nav className="sticky top-0 z-50 bg-white h-16 flex items-center justify-end pr-16 font-medium font-acumin-pro text-md shadow-sm">
       <Link to="/">
         <img
           src={logo}
@@ -47,22 +47,95 @@ const Nav = () => {
         />
       </Link>
 
-      <div className="flex gap-20">
-        <Link to="/">
-          <Dropdown menu={{ items, onClick: handleMenuClick }}>
-            <Link to="/">
-              <Space>Dashboard</Space>
-            </Link>
-          </Dropdown>
-        </Link>
-        <Link to="/Records">Records</Link>
-        <Link to="/Reminders">Reminders</Link>
-        <Link to="/Emergency">Emergency</Link>
-        <Link to="/Profile">Profile</Link>
+      <div className="flex gap-20 mt-2">
+        {/* <Link to="/"> */}
+        {/* <Dropdown menu={{ items, onClick: handleMenuClick }}>
+      <Link to="/">
+        <Space>Dashboard</Space>
+      </Link>
+    </Dropdown> */}
+
+        <Dropdown menu={{ items, onClick: handleMenuClick }}>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive ? "!underline" : "hover:!underline"
+            }
+          >
+            Dashboard
+          </NavLink>
+        </Dropdown>
+
+        <NavLink
+          to="/Records"
+          className={({ isActive }) =>
+            isActive ? "!underline" : "hover:!underline"
+          }
+        >
+          Records
+        </NavLink>
+
+        <NavLink
+          to="/Reminders"
+          className={({ isActive }) =>
+            isActive ? "!underline" : "hover:!underline"
+          }
+        >
+          Reminders
+        </NavLink>
+
+        {/* <NavLink
+          to="/Emergency"
+          className={({ isActive }) =>
+            isActive
+              ? "!underline"
+              : "hover:!underline"
+          }
+        >
+          Emergency
+        </NavLink> */}
+
+        {/* <Link to="/CreateProfile">create</Link> */}
+
+        {/* SHOW PROFILE ONLY IF LOGGED IN */}
+        {user ? (
+          <NavLink
+            to="/Profile"
+            className={({ isActive }) =>
+              isActive ? "!underline" : "hover:!underline"
+            }
+          >
+            Profile
+          </NavLink>
+        ) : null}
+
+        {/* LOGIN / LOGOUT  */}
+        <div className="flex items-center gap-5">
+          {user ? (
+            // LOGGED
+            <div className="flex items-center gap-4">
+              <p className="text-gray-700">Hi, {user.name}</p>
+
+              <button
+                onClick={logout}
+                className="bg-red-500 text-white px-4 py-1 rounded-full"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            // NOT LOGGED IN
+            <button
+              onClick={() => setShowLogin(true)}
+              className="bg-blue-600 text-white px-5 py-1 rounded-full"
+            >
+              Login
+            </button>
+          )}
+        </div>
       </div>
     </nav>
   );
 };
 
 export default Nav;
-

@@ -1,42 +1,81 @@
 import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
 import dotenv from "dotenv";
-import cron from "node-cron";
-
+import cors from "cors";
+import connectDB from "./config/mongodb.js";
+import userRoutes from "./routes/userRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
+import webpush from "web-push";
 import reminderRoutes from "./routes/reminderRoutes.js";
-import Reminder from "./models/Reminder.js";
+import recordRoutes from "./routes/RecordRoutes.js";
+import shareRoutes from "./routes/shareRoutes.js";
+import User from "./models/userModel.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
+// console.log("MONGO_URI =>", process.env.MONGO_URI);
+connectDB();
+import "./utils/scheduler.js";
+
+
+
 const app = express();
-app.use(cors());
+// app.use(cors());
+// allow frontend to access backend
+app.use(cors({
+  origin: "http://localhost:5173", // Vite frontend port
+  credentials: true,
+}));
+
 app.use(express.json());
 
-// connect DB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("✅ MongoDB connected"))
-.catch(err => console.log("❌ DB error:", err));
 
-// routes
-app.use("/api/reminders", reminderRoutes);
+webpush.setVapidDetails(
+    "mailto:example@gmail.com",
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
-// cron job to check due reminders
-cron.schedule("* * * * *", async () => {
-  const now = new Date();
-  const dueReminders = await Reminder.find({
-    time: { $lte: now },
-    notified: false
-  });
+app.get("/test-push", async (req, res) => {
+  try {
+    const user = await User.findOne({ subscription: { $ne: null } });
 
-  for (let reminder of dueReminders) {
-    console.log("⏰ Reminder due:", reminder.title);
-    reminder.notified = true;
-    await reminder.save();
+    if (!user) return res.send("No subscribed user found");
+
+    await webpush.sendNotification(
+      user.subscription,
+      JSON.stringify({
+        title: "Reminder",
+        body: "Time for medicine!"
+      })
+    );
+
+    res.send("✅ Push sent successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Push failed");
   }
 });
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.get("/", (req, res) => res.send("Backend is running fine!"));
+
+// app.use("/api", recordRoutes);
+// app.use("/uploads", express.static(uploadDir));
+app.use("/api/user", userRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/reminders", reminderRoutes);
+app.use("/api/documents", recordRoutes);
+app.use("/api/share", shareRoutes);
+
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+
+// recorroutes , server.js upload.js 
+// fs mdoule is used in these files 
