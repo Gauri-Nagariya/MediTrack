@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AppContext } from "../Context/AppContext";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 
 const LoginForm = () => {
   const [state, setState] = useState("Login");
@@ -9,15 +10,17 @@ const LoginForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState("patient");
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     if (state === "Login") {
-      const success = await login(email, password);
+      const success = await login(email, password, role);
       if (success) setShowLogin(false);
     } else {
-      const success = await register(name, email, password);
+      const success = await register(name, email, password, role);
       if (success) setShowLogin(false);
     }
   };
@@ -72,15 +75,51 @@ const LoginForm = () => {
           />
         </div>
 
-        <div className="border px-6 py-2 rounded-full mt-4">
+        <div className="border px-6 py-2 rounded-full mt-4 flex items-center gap-2">
           <input
             onChange={(e) => setPassword(e.target.value)}
             value={password}
             className="outline-none text-sm w-full"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             required
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="text-gray-500 hover:text-gray-700 text-base leading-none"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+          </button>
+        </div>
+
+        <div className="mt-4">
+          <p className="text-sm mb-2">Continue as</p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setRole("patient")}
+              className={`py-2 rounded-full border text-sm ${
+                role === "patient"
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-slate-600 border-slate-300"
+              }`}
+            >
+              Patient
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("doctor")}
+              className={`py-2 rounded-full border text-sm ${
+                role === "doctor"
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-slate-600 border-slate-300"
+              }`}
+            >
+              Doctor
+            </button>
+          </div>
         </div>
 
         <p className="text-sm text-blue-600 my-4 cursor-pointer">

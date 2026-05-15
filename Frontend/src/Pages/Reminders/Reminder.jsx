@@ -332,7 +332,7 @@ const Reminder = () => {
             ]}
           >
             <Select
-              mode="tags" // allows manual input
+              // mode="tags" // allows manual input
               placeholder="Select or type a reminder type"
               options={[
                 { label: "Medication", value: "medication" },

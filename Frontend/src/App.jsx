@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 // import Nav from "./components/Nav";
 const Nav = React.lazy(() => import("./components/Nav"));
 
@@ -48,6 +48,12 @@ const MedicalInformation = React.lazy(() =>
 
 // import Setting from "./Pages/Profile/Setting";
 const Setting = React.lazy(() => import("./Pages/Profile/Setting"));
+const ProfileAppointments = React.lazy(() =>
+  import("./Pages/Profile/Appointments")
+);
+const AppointmentDetails = React.lazy(() =>
+  import("./Pages/Profile/AppointmentDetails")
+);
 
 // import History from "./Pages/Profile/History";
 const History = React.lazy(() => import("./Pages/Profile/History"));
@@ -59,13 +65,95 @@ const History = React.lazy(() => import("./Pages/Profile/History"));
 const YourInformation = React.lazy(() =>
   import("./Pages/Profile/YourInformation")
 );
+const DoctorDashboard = React.lazy(() =>
+  import("./Pages/Doctor/DoctorDashboard")
+);
+const DoctorProfile = React.lazy(() => import("./Pages/Doctor/DoctorProfile"));
+const DoctorAppointments = React.lazy(() =>
+  import("./Pages/Doctor/DoctorAppointments")
+);
+const DoctorAppointmentsHistory = React.lazy(() =>
+  import("./Pages/Doctor/DoctorAppointmentsHistory")
+);
+const DoctorAppointmentsStatusDetails = React.lazy(() =>
+  import("./Pages/Doctor/DoctorAppointmentsStatusDetails")
+);
+const DoctorAppointmentDetails = React.lazy(() =>
+  import("./Pages/Doctor/DoctorAppointmentDetails")
+);
+const DoctorSharedDocuments = React.lazy(() =>
+  import("./Pages/Doctor/DoctorSharedDocuments")
+);
+const BookAppointments = React.lazy(() =>
+  import("./Pages/Patient/BookAppointments")
+);
+const DoctorDetails = React.lazy(() => import("./Pages/Patient/DoctorDetails"));
 
 import { subscribeUser } from "./utils/pushSubscribe";
 import { Suspense } from "react";
+import { Tour } from "antd";
+import PageLoader from "./components/PageLoader";
 
 const App = () => {
   const location = useLocation();
   const { user, showLogin, setShowLogin, loading } = useContext(AppContext);
+  const [showTour, setShowTour] = useState(false);
+  const isDoctor = user?.role === "doctor";
+  const onboardingKey = user?._id ? `meditrack-tour-seen-${user._id}` : null;
+
+  const patientTourSteps = useMemo(
+    () => [
+      {
+        title: "Dashboard",
+        description: "Check health highlights, quick actions, and updates here.",
+        target: () => document.getElementById("nav-dashboard"),
+      },
+      {
+        title: "Records",
+        description: "Store and organize prescriptions, reports, bills, and more.",
+        target: () => document.getElementById("nav-records"),
+      },
+      {
+        title: "Reminders",
+        description: "Set medicine and health reminders so you never miss a dose.",
+        target: () => document.getElementById("nav-reminders"),
+      },
+      {
+        title: "Book Appointments",
+        description: "Find doctors and schedule visits in a few clicks.",
+        target: () => document.getElementById("nav-appointments"),
+      },
+      {
+        title: "Profile",
+        description: "Manage your personal info, medical details, and settings.",
+        target: () => document.getElementById("nav-profile"),
+      },
+    ],
+    []
+  );
+
+  const doctorTourSteps = useMemo(
+    () => [
+      {
+        title: "Doctor Dashboard",
+        description: "View your summary and key updates at a glance.",
+        target: () => document.getElementById("nav-doctor-dashboard"),
+      },
+      {
+        title: "Doctor Profile",
+        description: "Keep your profile and professional details up to date.",
+        target: () => document.getElementById("nav-doctor-profile"),
+      },
+      {
+        title: "Appointments",
+        description: "Track current and upcoming patient appointments.",
+        target: () => document.getElementById("nav-doctor-appointments"),
+      },
+    ],
+    []
+  );
+
+  const tourSteps = isDoctor ? doctorTourSteps : patientTourSteps;
 
   // Whenever user is not logged in and tries to navigate, show login form
   //   useEffect(() => {
@@ -79,6 +167,17 @@ const App = () => {
       setShowLogin(true);
     }
   }, [loading, user, location]);
+
+  useEffect(() => {
+    if (loading || !user?._id || !onboardingKey) return;
+    const shouldShowAfterSignup =
+      localStorage.getItem("meditrack-show-tour-after-signup") === "true";
+    const alreadySeenTour = localStorage.getItem(onboardingKey) === "true";
+    if (shouldShowAfterSignup && !alreadySeenTour) {
+      setShowTour(true);
+      localStorage.removeItem("meditrack-show-tour-after-signup");
+    }
+  }, [loading, user, onboardingKey]);
 
   useEffect(() => {
     if (!loading && user?._id) {
@@ -126,13 +225,22 @@ const App = () => {
   return (
     <div>
       <Suspense
-        fallback={
-          <p className="text-2xl flex justify-center h-screen items-center">
-            Loading...
-          </p>
-        }
+        fallback={<PageLoader minHeight={"100vh"} label="Loading..." />}
       >
         <Nav />
+
+        <Tour
+          open={showTour}
+          onClose={() => {
+            setShowTour(false);
+            if (onboardingKey) {
+              localStorage.setItem(onboardingKey, "true");
+            }
+          }}
+          steps={tourSteps}
+          nextButtonProps={{ children: "Next" }}
+          prevButtonProps={{ children: "Back" }}
+        />
 
         {showLogin && (
           <div className="fixed inset-0 z-50 flex justify-center items-center backdrop-blur-sm bg-black/50">
@@ -152,7 +260,11 @@ const App = () => {
           <Route
             path="/records/*"
             element={
-              loading ? null : user ? <Records /> : <Navigate to="/" replace />
+              loading
+                ? null
+                : user && !isDoctor
+                ? <Records />
+                : <Navigate to="/" replace />
             }
           >
             {user && (
@@ -169,7 +281,31 @@ const App = () => {
           <Route
             path="/reminders"
             element={
-              loading ? null : user ? <Reminder /> : <Navigate to="/" replace />
+              loading
+                ? null
+                : user && !isDoctor
+                ? <Reminder />
+                : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/book-appointments"
+            element={
+              loading
+                ? null
+                : user && !isDoctor
+                ? <BookAppointments />
+                : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/book-appointments/doctor/:doctorId"
+            element={
+              loading
+                ? null
+                : user && !isDoctor
+                ? <DoctorDetails />
+                : <Navigate to="/" replace />
             }
           />
           <Route
@@ -185,7 +321,7 @@ const App = () => {
 
           <Route
             path="/profile/*"
-            element={user ? <Profile /> : <Navigate to="/" replace />}
+            element={user && !isDoctor ? <Profile /> : <Navigate to="/" replace />}
           >
             {user && (
               <>
@@ -195,10 +331,70 @@ const App = () => {
                   element={<MedicalInformation />}
                 />
                 <Route path="History" element={<History />} />
+                <Route path="Appointments" element={<ProfileAppointments />} />
+                <Route
+                  path="Appointments/:appointmentId"
+                  element={<AppointmentDetails />}
+                />
                 <Route path="Setting" element={<Setting />} />
               </>
             )}
           </Route>
+
+          <Route
+            path="/doctor/dashboard"
+            element={
+              user && isDoctor ? <DoctorDashboard /> : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/doctor/profile"
+            element={
+              user && isDoctor ? <DoctorProfile /> : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/doctor/appointments"
+            element={
+              user && isDoctor ? <DoctorAppointments /> : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/doctor/appointments-history"
+            element={
+              user && isDoctor ? (
+                <DoctorAppointmentsHistory />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/doctor/shared-documents"
+            element={
+              user && isDoctor ? <DoctorSharedDocuments /> : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/doctor/appointments/:appointmentId"
+            element={
+              user && isDoctor ? (
+                <DoctorAppointmentDetails />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/doctor/appointments-status/:status"
+            element={
+              user && isDoctor ? (
+                <DoctorAppointmentsStatusDetails />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
         </Routes>
       </Suspense>
     </div>

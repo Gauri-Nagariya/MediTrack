@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  CalendarOutlined,
   SettingOutlined,
   UploadOutlined,
   UserOutlined,
@@ -25,7 +26,8 @@ const App = () => {
     { key: "1", icon: <UserOutlined />, label: "Your Information", path: "/Profile" },
     { key: "2", icon: <UploadOutlined />, label: "Medical Information", path: "/Profile/MedicalInformation" },
     { key: "3", icon: <UserOutlined />, label: "Activity History", path: "/Profile/History" },
-    { key: "4", icon: <SettingOutlined />, label: "Setting", path: "/Profile/Setting" },
+    { key: "4", icon: <CalendarOutlined />, label: "My Appointments", path: "/Profile/Appointments" },
+    { key: "5", icon: <SettingOutlined />, label: "Setting", path: "/Profile/Setting" },
     ];
 
   const pageTitles = menuItems.reduce((acc, item) => {
@@ -39,7 +41,8 @@ const App = () => {
   if (path === "/Profile") return "1";
   if (path.startsWith("/Profile/MedicalInformation")) return "2";
   if (path.startsWith("/Profile/History")) return "3";
-  if (path.startsWith("/Profile/Setting")) return "4";
+  if (path.startsWith("/Profile/Appointments")) return "4";
+  if (path.startsWith("/Profile/Setting")) return "5";
 
   return "1";
 };

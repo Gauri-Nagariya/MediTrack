@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Row, message, Popconfirm, Button, Modal, Checkbox } from "antd";
-import { QRCodeCanvas } from "qrcode.react";
+import { Card, Col, Row, message, Popconfirm, Button, Checkbox } from "antd";
 import axios from "axios";
+import ShareWithDoctorModal from "../../components/ShareWithDoctorModal";
 
 const { Meta } = Card;
 
 const BillsInvoices = () => {
   const [billsInvoices, setBillsInvoices] = useState([]);
   const [selectedDocs, setSelectedDocs] = useState([]);
-  const [qrLink, setQrLink] = useState("");
-  const [showQR, setShowQR] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const [previewDoc, setPreviewDoc] = useState(null);
   const [zoom, setZoom] = useState(1);
@@ -45,21 +44,11 @@ const BillsInvoices = () => {
     );
   };
 
-  const generateQR = async () => {
+  const openShare = async () => {
     if (selectedDocs.length === 0) {
       return message.warning("Select at least one document");
     }
-
-    try {
-      const res = await axios.post(`${backendUrl}/api/share`, {
-        documentIds: selectedDocs,
-      });
-
-      setQrLink(res.data.link);
-      setShowQR(true);
-    } catch {
-      message.error("Failed to create QR");
-    }
+    setShowShareModal(true);
   };
 
   const openPreview = (doc) => {
@@ -79,9 +68,9 @@ const BillsInvoices = () => {
       <Button
         type="primary"
         style={{ marginBottom: 25 }}
-        onClick={generateQR}
+        onClick={openShare}
       >
-        Generate QR
+        Share
       </Button>
 
       <Row gutter={[24, 60]}>
@@ -156,34 +145,12 @@ const BillsInvoices = () => {
         ))}
       </Row>
 
-      {/* QR MODAL */}
-      <Modal open={showQR} footer={null} onCancel={() => setShowQR(false)}>
-        <h3 style={{ textAlign: "center" }}>Scan QR to access documents</h3>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <QRCodeCanvas id="qrCodeCanvas" value={qrLink} size={256} />
-        </div>
-        <p style={{ textAlign: "center", marginTop: 10 }}>{qrLink}</p>
-         <div
-          style={{ display: "flex", justifyContent: "center", marginTop: 20 }}
-        >
-          <Button
-            type="primary"
-            onClick={() => {
-              const canvas = document.getElementById("qrCodeCanvas");
-              const pngUrl = canvas
-                .toDataURL("image/png")
-                .replace("image/png", "image/octet-stream");
-
-              const downloadLink = document.createElement("a");
-              downloadLink.href = pngUrl;
-              downloadLink.download = "prescriptions_qr.png";
-              downloadLink.click();
-            }}
-          >
-            Download QR
-          </Button>
-        </div>
-      </Modal>
+      <ShareWithDoctorModal
+        open={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        documentIds={selectedDocs}
+        onShared={() => setSelectedDocs([])}
+      />
     </div>
   );
 };

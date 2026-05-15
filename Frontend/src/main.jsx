@@ -4,12 +4,13 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import AppContextProvider from './Context/AppContext.jsx'
 import { Suspense } from 'react'
+import PageLoader from './components/PageLoader.jsx'
 
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
    <AppContextProvider>
-    <Suspense fallback={<p>Loading...</p>}>
+    <Suspense fallback={<PageLoader minHeight={"100vh"} label="Loading..." />}>
     <App />
     </Suspense>
   </AppContextProvider>
