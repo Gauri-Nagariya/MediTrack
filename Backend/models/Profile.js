@@ -24,13 +24,22 @@ const profileSchema = new mongoose.Schema({
   height: Number,
   weight: Number,
   profilePhoto: String,
+  emailId: String,
   // phone: String,
   phone: {
   type: String,
   required: true,
   match: /^[0-9]{10}$/
 },
+  emergencyContactNumber: String,
   address: String,
+  insuranceDetails: String,
+  medicalHistory: String,
+  currentMedications: String,
+  medicalReportsUpload: String,
+  doctorPrescriptions: String,
+  appointmentHistory: String,
+  vaccinationRecords: String,
   // emergencyContactName: String,
   // emergencyContactPhone: String,
   emergencyContacts: [
@@ -49,6 +58,45 @@ const profileSchema = new mongoose.Schema({
   disabilities: [String],
   healthId: String,
   preferredHospital: String,
+
+  // Doctor profile fields
+  doctorGender: {
+    type: String,
+    enum: ["Male", "Female", "Other", ""],
+    default: "",
+  },
+  doctorDateOfBirth: Date,
+  languagesSpoken: [String],
+  specialization: String,
+  degreesQualifications: String,
+  medicalLicenseNumber: String,
+  yearsOfExperience: Number,
+  hospitalClinicName: String,
+  currentPosition: String,
+  doctorEmail: String,
+  doctorPhone: String,
+  clinicAddress: String,
+  cityState: String,
+  workingDays: [String],
+  consultationTimings: String,
+  consultationMode: {
+    type: String,
+    enum: ["Online", "Offline", "Both", ""],
+    default: "",
+  },
+  emergencyAvailability: {
+    type: String,
+    enum: ["Yes", "No", ""],
+    default: "",
+  },
+  consultationFees: Number,
+  servicesOffered: [String],
+  acceptedInsurance: [String],
+  shortBio: String,
+  achievementsCertifications: String,
+  medicalCertificate: String,
+  licenseUpload: String,
+  idProof: String,
 },{ timestamps: true });
 
 export default mongoose.model("Profile", profileSchema);

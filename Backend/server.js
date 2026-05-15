@@ -8,6 +8,7 @@ import webpush from "web-push";
 import reminderRoutes from "./routes/reminderRoutes.js";
 import recordRoutes from "./routes/RecordRoutes.js";
 import shareRoutes from "./routes/shareRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
 import User from "./models/userModel.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -47,7 +48,8 @@ app.use(cors({
 }));
 
 
-app.use(express.json());
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ limit: "25mb", extended: true }));
 
 
 webpush.setVapidDetails(
@@ -91,6 +93,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/reminders", reminderRoutes);
 app.use("/api/documents", recordRoutes);
 app.use("/api/share", shareRoutes);
+app.use("/api/appointments", appointmentRoutes);
 
 
 const PORT = process.env.PORT || 5000;
