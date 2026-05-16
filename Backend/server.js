@@ -26,7 +26,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",                 // development
-  "https://meditrack-black.vercel.app",
+  // "https://meditrack-black.vercel.app",
   "https://medi-track-roan.vercel.app"     // production
 ];
 
