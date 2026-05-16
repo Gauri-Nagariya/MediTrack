@@ -15,14 +15,16 @@ const DoctorDashboard = () => {
     cancelled: 0,
   });
   const [isLoading, setIsLoading] = useState(false);
-
   useEffect(() => {
     const load = async () => {
       try {
         setIsLoading(true);
-        const { data } = await axios.get(`${backendUrl}/api/appointments/doctor`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await axios.get(
+          `${backendUrl}/api/appointments/doctor`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
         if (!data.success) return;
         const all = data.appointments || [];
         setCounts({
@@ -40,7 +42,6 @@ const DoctorDashboard = () => {
     };
     if (token) load();
   }, [backendUrl, token]);
-
   const statusCards = useMemo(
     () => [
       {
@@ -79,20 +80,24 @@ const DoctorDashboard = () => {
         tone: "bg-zinc-500",
       },
     ],
-    [counts]
+    [counts],
   );
-
   if (isLoading) {
     return <PageLoader minHeight={280} label="Loading dashboard..." />;
   }
-
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
-      <div className="rounded-3xl bg-gradient-to-r from-slate-800 via-cyan-800 to-teal-700 text-white p-8 shadow-xl mb-8">
-        <p className="text-sm tracking-wide uppercase text-cyan-100">Care Command Center</p>
-        <h1 className="text-3xl md:text-4xl font-bold mt-2">Welcome, Dr. {user?.name || "Doctor"}</h1>
+      <div className="rounded-3xl bg-gradient-to-r from-slate-800 via-cyan-800
+       to-teal-700 text-white p-8 shadow-xl mb-8">
+        <p className="text-sm tracking-wide uppercase text-cyan-100">
+          Care Command Center
+        </p>
+        <h1 className="text-3xl md:text-4xl font-bold mt-2">
+          Welcome, Dr. {user?.name || "Doctor"}
+        </h1>
         <p className="mt-3 text-cyan-50 max-w-2xl">
-          Track appointments, monitor patient flow, and open each category for complete details.
+          Track appointments, monitor patient flow, and open each category for
+          complete details.
         </p>
       </div>
 
@@ -101,13 +106,19 @@ const DoctorDashboard = () => {
           <button
             key={card.key}
             onClick={() => navigate(`/doctor/appointments-status/${card.key}`)}
-            className="group text-left bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
+            className="group text-left bg-white rounded-2xl p-5 border border-slate-200 
+            shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
           >
-            <div className={`w-10 h-10 rounded-xl ${card.tone} text-white flex items-center justify-center font-semibold`}>
+            <div
+              className={`w-10 h-10 rounded-xl ${card.tone} text-white flex items-center 
+              justify-center font-semibold`}
+            >
               {card.value}
             </div>
             <p className="mt-4 text-sm text-slate-500">{card.hint}</p>
-            <h2 className="text-lg font-semibold text-slate-800">{card.label}</h2>
+            <h2 className="text-lg font-semibold text-slate-800">
+              {card.label}
+            </h2>
             <p className="mt-3 text-sm text-cyan-700 font-medium group-hover:underline">
               View details
             </p>

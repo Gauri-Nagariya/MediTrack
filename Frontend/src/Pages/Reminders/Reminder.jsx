@@ -1,194 +1,3 @@
-// import React, { useEffect, useState, useContext } from "react";
-// import {
-//   Card,
-//   Row,
-//   Col,
-//   Input,
-//   Switch,
-//   Button,
-//   DatePicker,
-//   TimePicker,
-//   Select,
-//   Form,
-//   message,
-// } from "antd";
-// import axios from "axios";
-// import { AppContext } from "../../Context/AppContext";
-// import moment from "moment";
-
-// const Reminder = () => {
-//   const { user, backendUrl } = useContext(AppContext);
-//   const [reminders, setReminders] = useState([]);
-//   const [form] = Form.useForm();
-
-//   useEffect(() => {
-//     if (user) fetchReminders();
-//   }, [user]);
-
-//   const fetchReminders = async () => {
-//     try {
-//       const token = localStorage.getItem("token"); // auth token
-//       const { data } = await axios.get(`${backendUrl}/api/reminders`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-
-//       if (data.success) {
-//         setReminders(data.reminders);
-//       }
-//     } catch (err) {
-//       console.error(err);
-//       message.error("Failed to fetch reminders");
-//     }
-//   };
-
-//   const onFinish = async (values) => {
-//   try {
-//     const formattedTime = values.time
-//       ? values.time.format("HH:mm")
-//       : null;
-
-//     const payload = {
-//       ...values,
-//       time: formattedTime,
-//       date: values.date.format("YYYY-MM-DD"),
-//     };
-
-//     const token = localStorage.getItem("token");
-//     const { data } = await axios.post(
-//       `${backendUrl}/api/reminders`,
-//       payload,
-//       {
-//         headers: { Authorization: `Bearer ${token}` },
-//       }
-//     );
-
-//     if (data.success) {
-//       message.success("Reminder saved!");
-//       form.resetFields();
-//       // OPTIONAL: Refresh list
-//       // fetchReminders();
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     message.error("Failed to save reminder");
-//   }
-// };
-
-// const deleteReminder = async (id) => {
-//   try {
-//     const token = localStorage.getItem("token");
-
-//     await axios.delete(`${backendUrl}/api/reminders/${id}`, {
-//       headers: { Authorization: `Bearer ${token}` },
-//     });
-
-//     message.success("Reminder deleted");
-//     setReminders((prev) => prev.filter((r) => r._id !== id));
-//   } catch (err) {
-//     console.error(err);
-//     message.error("Delete failed");
-//   }
-// };
-
-//   return (
-//     <div className="flex gap-4">
-//       <div
-//         style={{
-//           width: "40vw",
-//           background: "white",
-//           padding: 20,
-//           borderRadius: 5,
-//         }}
-//       >
-//         <Form layout="vertical" form={form} onFinish={onFinish}>
-//           <h2>Set Reminder</h2>
-
-//           <Form.Item
-//             name="reminderType"
-//             label="Reminder Type"
-//             rules={[{ required: true }]}
-//           >
-//             <Select
-//               options={[
-//                 { label: "Medication", value: "medication" },
-//                 { label: "Appointment", value: "appointment" },
-//                 { label: "Test / Lab", value: "test" },
-//                 { label: "Other", value: "other" },
-//               ]}
-//             />
-//           </Form.Item>
-
-//           <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-//             <Input placeholder="Take BP Medicine" />
-//           </Form.Item>
-
-//           <Form.Item name="notes" label="Notes">
-//             <Input.TextArea rows={3} />
-//           </Form.Item>
-
-//           <div className="flex gap-4">
-//             <Form.Item name="date" label="Date" rules={[{ required: true }]}>
-//               <DatePicker />
-//             </Form.Item>
-//             <Form.Item name="time" label="Time" rules={[{ required: true }]}>
-//               <TimePicker format="HH:mm" />
-//             </Form.Item>
-//           </div>
-
-//           <Form.Item>
-//             <Button type="primary" htmlType="submit" block>
-//               Save Reminder
-//             </Button>
-//           </Form.Item>
-//         </Form>
-//       </div>
-
-//       <div
-//         style={{
-//           flex: 1,
-//           background: "white",
-//           padding: 20,
-//           borderRadius: 5,
-//           maxHeight: "650px",
-//           overflowY: "auto",
-//         }}
-//       >
-//         <Row gutter={[16, 16]}>
-//           {reminders.map((r) => (
-//             <Col key={r._id} span={8}>
-//               <Card
-//   title={r.title}
-//   extra={`${r.date} ${r.time}`}
-//   actions={[
-//     <Popconfirm
-//       title="Are you sure you want to delete?"
-//       okText="Yes"
-//       cancelText="No"
-//       onConfirm={() => deleteReminder(r._id)}
-//       key="delete"
-//     >
-//       <span style={{ color: "red", cursor: "pointer" }}>Delete</span>
-//     </Popconfirm>
-//   ]}
-// >
-//   <p>Type: {r.reminderType}</p>
-//   <p>Notes: {r.notes || "—"}</p>
-
-//   <div className="flex items-center gap-2">
-//     <strong>Status:</strong>
-//     <Switch checked={r.status} />
-//   </div>
-// </Card>
-
-//             </Col>
-//           ))}
-//         </Row>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Reminder;
 
 import React, { useEffect, useState, useContext } from "react";
 import {
@@ -253,7 +62,7 @@ const Reminder = () => {
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (data.success) {
@@ -323,7 +132,6 @@ const Reminder = () => {
           <h2 className=" font-bold text-2xl text-blue-600 mb-10">
             Set Reminder
           </h2>
-
           <Form.Item
             name="reminderType"
             label="Reminder Type"
@@ -342,15 +150,12 @@ const Reminder = () => {
               ]}
             />
           </Form.Item>
-
           <Form.Item name="title" label="Title" rules={[{ required: true }]}>
             <Input placeholder="Take BP Medicine" />
           </Form.Item>
-
           <Form.Item name="notes" label="Notes">
             <Input.TextArea rows={3} />
           </Form.Item>
-
           <div className="flex gap-4">
             <Form.Item name="date" label="Date" rules={[{ required: true }]}>
               <DatePicker />
@@ -359,13 +164,11 @@ const Reminder = () => {
               <TimePicker format="HH:mm" valueFormat="HH:mm" />
             </Form.Item>
           </div>
-
           <Button type="primary" htmlType="submit" block>
             Save Reminder
           </Button>
         </Form>
       </div>
-
       {/* RIGHT PANEL = REMINDERS LIST */}
       <div
         style={{
@@ -412,7 +215,7 @@ const Reminder = () => {
                   <p style={{ margin: "6px 0 0 0", fontSize: 14 }}>
                     <strong>Time:</strong>{" "}
                     {moment(`${r.date} ${r.time}`, "YYYY-MM-DD HH:mm").format(
-                      "HH:mm"
+                      "HH:mm",
                     )}
                   </p>
 
