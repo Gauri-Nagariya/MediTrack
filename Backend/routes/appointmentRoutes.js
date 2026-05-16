@@ -733,6 +733,9 @@ router.post("/book", authMiddleware, requirePatient, async (req, res) => {
   }
 });
 
+
+
+
 router.get("/patient", authMiddleware, requirePatient, async (req, res) => {
   try {
     const appointments = await Appointment.find({

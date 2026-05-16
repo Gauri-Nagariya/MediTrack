@@ -1,8 +1,6 @@
 import express from "express";
 import Profile from "../models/Profile.js";
-
 const router = express.Router();
-
 router.post("/create", async (req, res) => {
   try {
     const { userId, ...formData } = req.body;
@@ -14,18 +12,15 @@ router.post("/create", async (req, res) => {
     }
 
     const profile = new Profile({ userId, ...formData });
-    
+
     await profile.save();
 
     res.json({ message: "Profile created successfully" });
-  } 
-  catch (error) {
+  } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
 router.get("/check/:userId", async (req, res) => {
   try {
     const profile = await Profile.findOne({ userId: req.params.userId });
@@ -35,13 +30,8 @@ router.get("/check/:userId", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
-
 router.get("/:userId", async (req, res) => {
   try {
-    // console.log("USER ID RECEIVED:", req.params.userId); // 👈 add this
-
     const profile = await Profile.findOne({ userId: req.params.userId });
 
     if (!profile) {
@@ -54,52 +44,24 @@ router.get("/:userId", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-// router.put("/update/:userId", async (req, res) => {
-//   try {
-//     const updated = await Profile.findOneAndUpdate(
-//       { userId: req.params.userId },
-//       req.body,
-//       { new: true, runValidators: true }
-//     );
-
-//     if (!updated) {
-//       return res.status(404).json({ message: "Profile not found" });
-//     }
-
-//     res.json(updated);
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
-
-
 router.put("/update/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
-
-    // Clean undefined fields
-  	const cleanData = {};
+    const cleanData = {};
     Object.keys(req.body).forEach((key) => {
       if (req.body[key] !== undefined) {
         cleanData[key] = req.body[key];
       }
     });
-
     const updated = await Profile.findOneAndUpdate(
       { userId },
       { $set: cleanData },
-      { new: true, upsert: true }
+      { new: true, upsert: true },
     );
-
     return res.json(updated);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
-
 export default router;
