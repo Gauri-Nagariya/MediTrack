@@ -639,12 +639,9 @@ router.post("/book", authMiddleware, requirePatient, async (req, res) => {
           "Please create and complete your profile before booking an appointment.",
       });
     }
-    if (!patient.patientId) {
-      return res.json({
-        success: false,
-        message: "Patient ID is missing. Please re-login and try again.",
-      });
-    }
+    const bookingPatientId = patient.patientId?.trim() || String(req.userId);
+
+
     const appointmentDateObj = new Date(appointmentDate);
     if (Number.isNaN(appointmentDateObj.getTime())) {
       return res.json({ success: false, message: "Invalid appointment date" });
@@ -704,16 +701,28 @@ router.post("/book", authMiddleware, requirePatient, async (req, res) => {
     for (let retry = 0; retry < 3; retry += 1) {
       const appointmentPublicId = await generateAppointmentPublicId();
       try {
+        // appointment = await Appointment.create({
+        //   doctorId,
+        //   patientId: req.userId,
+        //   patientBookingId: patient.patientId,
+        //   appointmentPublicId,
+        //   patientName: patient?.name || "Patient",
+        //   patientEmail: patient?.email || "",
+        //   appointmentDate: appointmentDateObj,
+        //   reason: normalizedReason,
+        // });
+
         appointment = await Appointment.create({
           doctorId,
           patientId: req.userId,
-          patientBookingId: patient.patientId,
+          patientBookingId: bookingPatientId,
           appointmentPublicId,
           patientName: patient?.name || "Patient",
           patientEmail: patient?.email || "",
           appointmentDate: appointmentDateObj,
           reason: normalizedReason,
         });
+
         break;
       } catch (createError) {
         if (createError?.code !== 11000) throw createError;

@@ -183,8 +183,7 @@ const DoctorDetails = () => {
       : "0.0";
 
   const handleBookSlot = async () => {
-    // if (1!doctor?._id || !selectedSlot || isBooking) return;
-    if (!selectedSlot || isBooking) return;
+    if (!doctor?._id || !selectedSlot || isBooking) return;
     const normalizedReason = reason.trim();
     if (!normalizedReason) {
       setReasonError("Reason is required");
